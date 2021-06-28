@@ -1,69 +1,80 @@
 /* Token-flipping game Game class
 Include java.util.* for random class
-June 4, 2021 */
+June 4, 2021 
+
+Possible token combinations:
+Roll | Tokens
+-------------
+2	2
+3	1+2 3
+4	1+3 4
+5	1+4 2+3 5
+6	1+5 4+2 6
+7	1+6 3+4 2+5 1+2+4 7
+8	1+7 2+6 3+5 1+2+5 1+3+4 8
+9	1+8 2+7 3+6 4+5 1+3+5 2+3+4 1+2+6 9
+10	1+9 2+8 3+7 4+6 1+2+7 1+4+5 1+3+6 2+3+5 10
+11	1+10 2+9 3+8 4+7 5+6 1+2+8 1+3+7 1+4+6 2+3+6 2+4+5 11
+12	1+11 2+10 3+9 4+8 5+7 1+2+9 1+3+8 1+4+7 1+5+6 2+3+7 2+4+6 3+4+5 12
+
+*/
 import java.util.*;
 
 class TokenDiceGame {
+	Scanner myScanner;
+	long numGames;
+	long[] winnings = {0, 0};
+	boolean playing;			
+	Die diceOne = new Die();
+	Die diceTwo = new Die();
+	int numOne;
+	int numTwo;
+	ArrayList<Integer> tokens;
 
-	public static void play() {
+	public TokenDiceGame(Scanner scanner, long numOfGames) {
 
 		// User input variables
-		Scanner myScanner = new Scanner(System.in);
-		long numGames = 0;
-		byte answer = 2;
+		myScanner = scanner;
+		numGames = numOfGames;
 
 		// Won/lost games array
-		long[] games = {0, 0};
+		winnings[0] = 0;
+		winnings[1] = 0;
+
+		// Simluation boolean
+		playing = false;
+
+		// Dice numbers
+		numOne = 1;
+		numTwo = 1;
+
+		// Array list for tokens
+		tokens = new ArrayList<Integer>();
+
+	} // end constructor
+
+	public void play() {
 
 		// Main simulation loop
-		// obtain number of games from function
-		while (numGames == 0) {
-
-			numGames = getNumGames(myScanner);
-
-		} // end while
 
 		// Retreive won and lost games from simulation function
-		simulation(numGames, games);
+		simulation();
 			
-		System.out.println("Won Games: " + games[0]);
-		System.out.println("Lost Games: " + games[1]);
-
-		// Ask user if they want to run program again
-		while (answer == 2) {
-
-			answer = askQuit(myScanner);
-
-		} // end while
-
-		if (answer == 1) {
-
-			play();  // Go back to beginning
-
-		} // end if
+		System.out.println("Won Games: " + winnings[0]);
+		System.out.println("Lost Games: " + winnings[1]);
 
 	} // end play function
 
-	public static void simulation(long numGames, long[] games) {
-	
-		// Simluation boolean
-		boolean game = true;
-					
-		// Create dice objects
-		Die diceOne = new Die();
-		Die diceTwo = new Die();
+	public void simulation() {
 
-		// Dice numbers
-		int numOne = 0;
-		int numTwo = 0;
+		//System.out.println("In Simulation function!"); // DEBUG
 
 		// Run through simulation of each game
-		for (long i = 0; i < numGames; i++) {
+		for (long i = 0L; i < numGames; i++) {
 			// Set game running variable
-			game = true;
+			playing = true;
 
 			// Create array list for token sums
-			ArrayList<Integer> tokens = new ArrayList<Integer>();
 			for (int j = 1; j < 11; j++) {
 				tokens.add(j);
 			} // end for loop
@@ -71,8 +82,10 @@ class TokenDiceGame {
 			//System.out.println("Tokens: " + tokens); // DEBUG
 
 			// Main game loop
-			while (game) {
+			while (playing) {
 				
+				//System.out.println("In playing loop!"); // DEBUG
+
 				// Roll dice
 				numOne = diceOne.Roll();
 				numTwo = diceTwo.Roll();
@@ -86,17 +99,19 @@ class TokenDiceGame {
 
 				} catch (Exception e) {
 
+					// Try to see if any other tokens match up 
+
 					// Tokens are flipped.  Game is lost.
-					games[1]++;
-					game = false;
+					winnings[1]++;
+					playing = false;
 
 				} finally {
 
 					// Check for no tokens
 					if (tokens.size() == 0) {
 
-						games[0]++;
-						game = false;
+						winnings[0]++;
+						playing = false;
 
 					} // end if
 
@@ -104,67 +119,10 @@ class TokenDiceGame {
 
 			} // end game loop
 
-		} // end simulation
+			tokens.clear(); // Clean out tokens list
+
+		} // end for loop
 
 	} // end simulation function
-
-	public static long getNumGames(Scanner scan) {
-
-		// Use a try-catch block to get number of games, but check
-		// for invalid input
-		long games = 0;
-
-		// Use an error-catching variable for Strings
-		String errorTripWire;
-
-		try {
-		
-			// Prompt user for number of games
-			System.out.println("Please enter number of games: ");
-			games = scan.nextLong();
-
-		} catch (Exception e) {
-			
-			// Catch error String
-			errorTripWire = scan.next();
-			System.out.println("ERROR:  Invalid Input.");
-			games = 0; // Return no games to game function
-
-		} finally {
-			
-		
-			System.out.println("games: " + games); // DEBUG
-
-			return games;
-
-		}// end try-catch
-
-	} // end input number of games
-
-	public static byte askQuit(Scanner scan) {
-
-		byte answer = 0; // Answer for quitting
-		String errorTripWire;
-
-		// Prompt user if they want to run simulation again
-		try {
-
-			System.out.println("Would you like to quit?  Enter 0 for yes or 1 for no: ");
-			answer = scan.nextByte();
-
-		} catch (Exception e) {
-
-			errorTripWire = scan.next();
-			System.out.println("ERROR:  Invalid input.");
-			answer = 2; // Return undefined number as answer
-
-		} finally {
-
-			System.out.println("answer: " + answer); // DEBUG
-			return answer;
-
-		}// end try-catch
-	
-	} // end ask quit function
 
 } // end TokenDiceGame class
