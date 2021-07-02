@@ -1,55 +1,53 @@
 /* Token-flipping game Game class
-Include java.util.* for random class
 June 4, 2021 
-
-Possible token combinations:
-Roll | Tokens
--------------
-2	2
-3	1+2 3
-4	1+3 4
-5	1+4 2+3 5
-6	1+5 4+2 6
-7	1+6 3+4 2+5 1+2+4 7
-8	1+7 2+6 3+5 1+2+5 1+3+4 8
-9	1+8 2+7 3+6 4+5 1+3+5 2+3+4 1+2+6 9
-10	1+9 2+8 3+7 4+6 1+2+7 1+4+5 1+3+6 2+3+5 10
-11	1+10 2+9 3+8 4+7 5+6 1+2+8 1+3+7 1+4+6 2+3+6 2+4+5 11
-12	1+11 2+10 3+9 4+8 5+7 1+2+9 1+3+8 1+4+7 1+5+6 2+3+7 2+4+6 3+4+5 12
-
 */
 import java.util.*;
 
 class TokenDiceGame {
-	Scanner myScanner;
 	long numGames;
 	long[] winnings = {0, 0};
-	boolean playing;			
+	boolean match;			
 	Die diceOne = new Die();
 	Die diceTwo = new Die();
 	int numOne;
 	int numTwo;
-	ArrayList<Integer> tokens;
+	boolean[] tokens = {false, false, false, false, false, false, false, false, false, false, false, false};
+	int sumDice;
+	int sumTokens;
+	double winPercentage;
+	long rollNumber;
 
-	public TokenDiceGame(Scanner scanner, long numOfGames) {
+	public TokenDiceGame(long numOfGames) {
 
 		// User input variables
-		myScanner = scanner;
 		numGames = numOfGames;
 
 		// Won/lost games array
 		winnings[0] = 0;
 		winnings[1] = 0;
 
-		// Simluation boolean
-		playing = false;
+		// The percentage of won games over lost
+		winPercentage = 0d;
 
 		// Dice numbers
 		numOne = 1;
 		numTwo = 1;
 
-		// Array list for tokens
-		tokens = new ArrayList<Integer>();
+		/* The tokens are represented by a boolean array
+		   where flipping is determined by boolean values:
+		   false = down, true = flipped */
+
+		// Sum of all flipped tokens
+		sumTokens = 0;
+
+		// Sum of dice roll
+		sumDice = 0;
+
+		// Matching tokens boolean
+		match = true;
+
+		// Number roll of dice
+		rollNumber = 0L;
 
 	} // end constructor
 
@@ -57,72 +55,726 @@ class TokenDiceGame {
 
 		// Main simulation loop
 
-		// Retreive won and lost games from simulation function
-		simulation();
-			
-		System.out.println("Won Games: " + winnings[0]);
-		System.out.println("Lost Games: " + winnings[1]);
-
-	} // end play function
-
-	public void simulation() {
-
-		//System.out.println("In Simulation function!"); // DEBUG
-
 		// Run through simulation of each game
 		for (long i = 0L; i < numGames; i++) {
-			// Set game running variable
-			playing = true;
+			// Reset match boolean
+			match = true;
 
-			// Create array list for token sums
-			for (int j = 1; j < 11; j++) {
-				tokens.add(j);
-			} // end for loop
+			// Reset token sum
+			sumTokens = 0;
 
-			//System.out.println("Tokens: " + tokens); // DEBUG
+			// Reset array for tokens
+			resetTokens(tokens);
+
+			// Reset roll number
+			rollNumber = 0;
+
+			// Output game number
+			System.out.println("\nGame #" + (i + 1));
 
 			// Main game loop
-			while (playing) {
-				
-				//System.out.println("In playing loop!"); // DEBUG
+			while (match) {
 
-				// Roll dice
-				numOne = diceOne.Roll();
-				numTwo = diceTwo.Roll();
-				//System.out.println("Number One: " + numOne); // DEBUG
-				//System.out.println("Number Two: " + numTwo);
+				rollNumber++; // increase rolls
+
+				// If the maximum token not flipped is six,
+				// reduce dice by one.
+				if (sumTokens >= 57) {
+
+					System.out.println("Tokens less than six.  One die rolling...");
+					sumDice = diceOne.Roll();
+	
+				} else {
+
+					numOne = diceOne.Roll();
+					numTwo = diceTwo.Roll();
+					sumDice = numOne + numTwo;
+
+				} // end if
+				
+				System.out.println("\nRoll #" + rollNumber);
+				System.out.println("Sum of Dice: " + sumDice);
 
 				// Check if tokens match numbers on dice
-				try {
+				match = matchSumDiceWithTokens(tokens, sumDice, sumTokens);
 
-					tokens.remove(numOne + numTwo);
+				System.out.println("Tokens after flip: "); // Show which tokens are flipped and 									// which are down
 
-				} catch (Exception e) {
+				for (int b = 0; b < tokens.length; b++) {
 
-					// Try to see if any other tokens match up 
+					if (!tokens[b]) {
+					
+						System.out.println("Token " + (b + 1) + ": down"); 
 
-					// Tokens are flipped.  Game is lost.
-					winnings[1]++;
-					playing = false;
+					} else {
 
-				} finally {
-
-					// Check for no tokens
-					if (tokens.size() == 0) {
-
-						winnings[0]++;
-						playing = false;
+						System.out.println("Token " + (b + 1) + ": flipped");
 
 					} // end if
 
-				} // end try-catch clause
+				} // end for 
 
 			} // end game loop
 
-			tokens.clear(); // Clean out tokens list
+			// Game is won if maximum score for tokens
+			if (sumTokens == 78) {
+
+				winnings[0]++;
+
+			} else {
+
+				winnings[1]++; // Game is lost if maximum score not acheived
+				
+			} // end if
+
+			// Recalculate win percentage
+			winPercentage = winnings[0] / (winnings[0] + winnings[1]);
 
 		} // end for loop
+			
+		System.out.println("Won Games: " + winnings[0]);
+		System.out.println("Lost Games: " + winnings[1]);
+		System.out.println("Win Percentage: " + winPercentage);
 
-	} // end simulation function
+	} // end play function
+
+	public static void resetTokens(boolean[] tokens) {
+
+		int index;
+
+		for (byte j = 0; j < tokens.length; j++) {
+
+			tokens[j] = false;
+		
+		} // end for
+
+	} // end add tokens function
+
+	public static boolean matchSumDiceWithTokens(boolean[] tokens, int sumDice, int sumTokens) {
+		
+		/*
+
+			Possible token combinations:
+			Roll | Tokens
+			-------------
+			2	2
+			3	1+2 3
+			4	1+3 4
+			5	1+4 2+3 5
+			6	1+5 2+4 1+2+3 6
+			7	1+6 2+5 3+4 1+2+4 7
+			8	1+7 2+6 3+5 1+2+5 1+3+4 8
+			9	1+8 2+7 3+6 4+5 1+2+6 1+3+5 2+3+4 9
+			10	1+9 2+8 3+7 4+6 1+2+7 1+3+6 1+4+5 2+3+5 10
+			11	1+10 2+9 3+8 4+7 5+6 1+2+8 1+3+7 1+4+6 2+3+6 2+4+5 11
+			12	1+11 2+10 3+9 4+8 5+7 1+2+9 1+3+8 1+4+7 1+5+6 2+3+7 2+4+6 3+4+5 12
+
+		*/
+
+		switch (sumDice) {
+
+			case 1:
+
+				// Check if token 1 is flipped
+				if (!tokens[0]) {
+				
+					// Flip the token if not
+					tokens[0] = true;
+					sumTokens += 1; // Add to the token sum
+
+				} else {
+
+					return false; // If out of tokens, game is over
+
+				} // end if
+				
+				break;
+			
+			case 2:
+
+				if (!tokens[1]) {
+				
+					tokens[1] = true;
+					sumTokens += 2;
+
+				} else {
+
+					return false;
+
+				} // end if
+					
+				break;
+
+			case 3:
+				
+				if (!tokens[2]) {
+				
+					tokens[2] = true;
+					sumTokens += 3;
+
+				} else if (!tokens[0] && !tokens[1]) { 
+
+					// Check for a case of tokens adding up to sum of dice
+					tokens[0] = true;
+					sumTokens += 1;
+					tokens[1] = true;
+					sumTokens += 2;
+
+				} else {
+
+					return false;
+
+				} // end if
+
+				break;
+
+			case 4:
+
+				if (!tokens[3]) {
+				
+					tokens[3] = true;
+					sumTokens += 4;
+
+				} else if (!tokens[0] && !tokens[2]) { 
+
+					tokens[0] = true;
+					sumTokens += 1;
+					tokens[2] = true;
+					sumTokens += 3;
+
+				} else {
+
+					return false;
+
+				} // end if
+
+				break;
+
+			case 5:
+				
+				if (!tokens[4]) {
+				
+					tokens[4] = true;
+					sumTokens += 5;
+
+				} else if (!tokens[0] && !tokens[3]) { 
+
+					tokens[0] = true;
+					sumTokens += 1;
+					tokens[3] = true;
+					sumTokens += 4;
+
+				} else if (!tokens[1] && !tokens[2]) {
+
+					tokens[1] = true;
+					sumTokens += 2;
+					tokens[2] = true;
+					sumTokens += 3;
+
+				} else {
+
+					return false;
+
+				} // end if
+
+				break;
+
+			case 6:
+				
+				if (!tokens[5]) {
+				
+					tokens[5] = true;
+					sumTokens += 6;
+
+				} else if (!tokens[0] && !tokens[4]) { 
+
+					tokens[0] = true;
+					sumTokens += 1;
+					tokens[4] = true;
+					sumTokens += 5;
+
+				} else if (!tokens[1] && !tokens[3]) {
+
+					tokens[1] = true;
+					sumTokens += 2;
+					tokens[3] = true;
+					sumTokens += 4;
+
+				} else if (!tokens[0] && !tokens[1] && !tokens[2]) {
+
+					tokens[0] = true;
+					sumTokens += 1;
+					tokens[1] = true;
+					sumTokens += 2;
+					tokens[2] = true;
+					sumTokens += 3;
+
+				} else {
+
+					return false;
+
+				} // end if
+
+				break;
+
+			case 7:
+				
+				if (!tokens[6]) {
+				
+					tokens[6] = true;
+					sumTokens += 7;
+
+				} else if (!tokens[0] && !tokens[5]) { 
+
+					tokens[0] = true;
+					sumTokens += 1;
+					tokens[5] = true;
+					sumTokens += 6;
+
+				} else if (!tokens[1] && !tokens[4]) {
+
+					tokens[1] = true;
+					sumTokens += 2;
+					tokens[4] = true;
+					sumTokens += 5;
+
+				} else if (!tokens[2] && !tokens[3]) {
+
+					tokens[2] = true;
+					sumTokens += 3;
+					tokens[3] = true;
+					sumTokens += 4;
+
+				} else if (!tokens[0] && !tokens[1] && !tokens[3]) {
+
+					tokens[0] = true;
+					sumTokens += 1;
+					tokens[1] = true;
+					sumTokens += 2;
+					tokens[3] = true;
+					sumTokens += 4;
+
+				} else {
+
+					return false;
+
+				} // end if
+
+				break;
+
+			case 8:
+				
+				if (!tokens[7]) {
+				
+					tokens[7] = true;
+					sumTokens += 8;
+
+				} else if (!tokens[0] && !tokens[6]) { 
+
+					tokens[0] = true;
+					sumTokens += 1;
+					tokens[6] = true;
+					sumTokens += 7;
+
+				} else if (!tokens[1] && !tokens[5]) {
+
+					tokens[1] = true;
+					sumTokens += 2;
+					tokens[5] = true;
+					sumTokens += 6;
+				
+				} else if (!tokens[2] && !tokens[4]) {
+
+					tokens[2] = true;
+					sumTokens += 3;
+					tokens[4] = true;
+					sumTokens += 5;
+
+				} else if (!tokens[0] && !tokens[1] && !tokens[4]) {
+
+					tokens[0] = true;
+					sumTokens += 1;
+					tokens[1] = true;
+					sumTokens += 2;
+					tokens[4] = true;
+					sumTokens += 5;
+
+				} else if (!tokens[0] && !tokens[2] && !tokens[3]) {
+
+					tokens[0] = true;
+					sumTokens += 1;
+					tokens[2] = true;
+					sumTokens += 3;
+					tokens[3] = true;
+					sumTokens += 4;
+
+				} else {
+
+					return false;
+
+				} // end if
+
+				break;
+
+			case 9:
+
+				if (!tokens[8]) {
+
+					tokens[8] = true;
+					sumTokens += 9;
+				
+				} else if (!tokens[0] && !tokens[7]) {
+
+					tokens[0] = true;
+					sumTokens += 2;
+					tokens[7] = true;
+					sumTokens += 8;
+
+				} else if (!tokens[1] && !tokens[6]) {
+
+					tokens[1] = true;
+					sumTokens += 2;
+					tokens[5] = true;
+					sumTokens += 7;
+
+				} else if (!tokens[2] && !tokens[5]) {
+
+					tokens[2] = true;
+					sumTokens += 4;
+					tokens[5] = true;
+					sumTokens += 6;
+
+				} else if (!tokens[3] && !tokens[4]) {
+
+					tokens[3] = true;
+					sumTokens += 4;
+					tokens[4] = true;
+					sumTokens += 5;
+
+				} else if (!tokens[0] && !tokens[1] && !tokens[5]) {
+
+					tokens[0] = true;
+					sumTokens += 1;
+					tokens[1] = true;
+					sumTokens += 2;
+					tokens[5] = true;
+					sumTokens += 6;
+
+				} else if (!tokens[0] && !tokens[2] && !tokens[4]) {
+
+					tokens[0] = true;
+					sumTokens += 1;
+					tokens[2] = true;
+					sumTokens += 3;
+					tokens[4] = true;
+					sumTokens += 5;
+
+				} else if (!tokens[1] && !tokens[2] && !tokens[3]) {
+
+					tokens[1] = true;
+					sumTokens += 2;
+					tokens[2] = true;
+					sumTokens += 3;
+					tokens[3] = true;
+					sumTokens += 4;
+
+				} else { 
+
+					return false;
+
+				} // end if
+
+				break;
+
+			case 10:
+				
+				if (!tokens[9]) {
+
+					tokens[9] = true;
+					sumTokens += 10;
+
+				} else if (!tokens[0] && !tokens[8]) {
+
+					tokens[0] = true;
+					sumTokens += 1;
+					tokens[9] = true;
+					sumTokens += 9;
+
+				} else if (!tokens[1] && !tokens[7]) {
+
+					tokens[1] = true;
+					sumTokens += 2;
+					tokens[7] = true;
+					sumTokens += 8;
+
+				} else if (!tokens[2] && !tokens[6]) {
+
+					tokens[2] = true;
+					sumTokens += 3;
+					tokens[6] = true;
+					sumTokens += 7;
+
+				} else if (!tokens[3] && !tokens[5]) {
+
+					tokens[3] = true;
+					sumTokens += 4;
+					tokens[5] = true;
+					sumTokens += 6;
+				
+				} else if (!tokens[0] && !tokens[1] && !tokens[6]) {
+
+					tokens[0] = true;
+					sumTokens += 1;
+					tokens[1] = true;
+					sumTokens += 2;
+					tokens[6] = true;
+					sumTokens += 7;
+				
+				} else if (!tokens[0] && !tokens[2] && !tokens[5]) {
+
+					tokens[0] = true;
+					sumTokens += 1;
+					tokens[2] = true;
+					sumTokens += 3;
+					tokens[5] = true;
+					sumTokens += 6;
+				
+				} else if (!tokens[0] && !tokens[3] && !tokens[4]) {
+
+					tokens[0] = true;
+					sumTokens += 1;
+					tokens[3] = true;
+					sumTokens += 4;
+					tokens[4] = true;
+					sumTokens += 5;
+				
+				} else if (!tokens[1] && !tokens[2] && !tokens[4]) {
+
+					tokens[1] = true;
+					sumTokens += 2;
+					tokens[2] = true;
+					sumTokens += 3;
+					tokens[4] = true;
+					sumTokens += 4;
+
+				} else {
+
+					return false;
+
+				} // end if
+
+				break;
+
+			case 11:
+				
+				if (!tokens[10]) {
+
+					tokens[10] = true;
+					sumTokens += 11;
+
+				} else if (!tokens[0] && !tokens[9]) {
+
+					tokens[0] = true;
+					sumTokens += 1;
+					tokens[9] = true;
+					sumTokens += 10;
+
+				} else if (!tokens[1] && !tokens[8]) {
+
+					tokens[1] = true;
+					sumTokens += 2;
+					tokens[8] = true;
+					sumTokens += 9;
+
+				} else if (!tokens[2] && !tokens[7]) {
+
+					tokens[2] = true;
+					sumTokens += 3;
+					tokens[7] = true;
+					sumTokens += 8;
+
+				} else if (!tokens[3] && !tokens[6]) {
+
+					tokens[3] = true;
+					sumTokens += 4;
+					tokens[6] = true;
+					sumTokens += 7;
+
+				} else if (!tokens[4] && !tokens[5]) {
+
+					tokens[4] = true;
+					sumTokens += 5;
+					tokens[5] = true;
+					sumTokens += 6;
+				
+				} else if (!tokens[0] && !tokens[1] && !tokens[7]) {
+
+					tokens[0] = true;
+					sumTokens += 1;
+					tokens[1] = true;
+					sumTokens += 2;
+					tokens[7] = true;
+					sumTokens += 8;
+				
+				} else if (!tokens[0] && !tokens[2] && !tokens[6]) {
+
+					tokens[0] = true;
+					sumTokens += 1;
+					tokens[2] = true;
+					sumTokens += 3;
+					tokens[6] = true;
+					sumTokens += 7;
+				
+				} else if (!tokens[0] && !tokens[3] && !tokens[5]) {
+
+					tokens[0] = true;
+					sumTokens += 1;
+					tokens[3] = true;
+					sumTokens += 4;
+					tokens[5] = true;
+					sumTokens += 6;
+				
+				} else if (!tokens[1] && !tokens[3] && !tokens[4]) {
+
+					tokens[1] = true;
+					sumTokens += 2;
+					tokens[3] = true;
+					sumTokens += 4;
+					tokens[4] = true;
+					sumTokens += 5;
+
+				} else {
+
+					return false;
+	
+				} // end if
+
+				break;
+
+			case 12:
+				
+				if (!tokens[11]) {
+
+					tokens[11] = true;
+					sumTokens += 12;
+
+				} else if (!tokens[0] && !tokens[10]) {
+
+					tokens[0] = true;
+					sumTokens += 1;
+					tokens[10] = true;
+					sumTokens += 11;
+
+				} else if (!tokens[1] && !tokens[9]) {
+
+					tokens[1] = true;
+					sumTokens += 2;
+					tokens[9] = true;
+					sumTokens += 10;
+
+				} else if (!tokens[2] && !tokens[8]) {
+
+					tokens[2] = true;
+					sumTokens += 3;
+					tokens[8] = true;
+					sumTokens += 9;
+
+				} else if (!tokens[3] && !tokens[7]) {
+
+					tokens[3] = true;
+					sumTokens += 4;
+					tokens[7] = true;
+					sumTokens += 8;
+
+				} else if (!tokens[4] && !tokens[6]) {
+
+					tokens[4] = true;
+					sumTokens += 5;
+					tokens[6] = true;
+					sumTokens += 7;
+				
+				} else if (!tokens[0] && !tokens[1] && !tokens[8]) {
+
+					tokens[0] = true;
+					sumTokens += 1;
+					tokens[1] = true;
+					sumTokens += 2;
+					tokens[8] = true;
+					sumTokens += 9;
+				
+				} else if (!tokens[0] && !tokens[2] && !tokens[7]) {
+
+					tokens[0] = true;
+					sumTokens += 1;
+					tokens[2] = true;
+					sumTokens += 3;
+					tokens[7] = true;
+					sumTokens += 8;
+				
+				} else if (!tokens[0] && !tokens[3] && !tokens[6]) {
+
+					tokens[0] = true;
+					sumTokens += 1;
+					tokens[3] = true;
+					sumTokens += 4;
+					tokens[6] = true;
+					sumTokens += 7;
+				
+				} else if (!tokens[0] && !tokens[4] && !tokens[5]) {
+
+					tokens[0] = true;
+					sumTokens += 1;
+					tokens[4] = true;
+					sumTokens += 5;
+					tokens[5] = true;
+					sumTokens += 6;
+				
+				} else if (!tokens[0] && !tokens[1] && !tokens[5]) {
+
+					tokens[0] = true;
+					sumTokens += 1;
+					tokens[1] = true;
+					sumTokens += 2;
+					tokens[5] = true;
+					sumTokens += 6;
+				
+				} else if (!tokens[1] && !tokens[2] && !tokens[6]) {
+
+					tokens[1] = true;
+					sumTokens += 2;
+					tokens[2] = true;
+					sumTokens += 3;
+					tokens[6] = true;
+					sumTokens += 7;
+				
+				} else if (!tokens[1] && !tokens[3] && !tokens[5]) {
+
+					tokens[1] = true;
+					sumTokens += 2;
+					tokens[3] = true;
+					sumTokens += 4;
+					tokens[5] = true;
+					sumTokens += 6;
+				
+				} else if (!tokens[2] && !tokens[3] && !tokens[4]) {
+
+					tokens[2] = true;
+					sumTokens += 3;
+					tokens[3] = true;
+					sumTokens += 4;
+					tokens[4] = true;
+					sumTokens += 5;
+
+				} else {
+
+					return false;
+
+				} // end if
+
+			} // end switch
+
+		return true;
+
+	} // end match sum dice function 
 
 } // end TokenDiceGame class
