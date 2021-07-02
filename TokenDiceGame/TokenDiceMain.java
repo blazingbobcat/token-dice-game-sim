@@ -30,10 +30,6 @@ class TokenDiceMain {
 				System.out.println("ERROR:  Invalid Input.");
 				numOfGames = 0;
 
-			} finally {
-		
-				System.out.println("No. of games: " + numOfGames); // DEBUG
-
 			} // end try-catch
 
 		} while (numOfGames == 0);
@@ -94,7 +90,7 @@ class TokenDiceMain {
 		int answer = 0;
 
 		// Create game object
-		TokenDiceGame game = new TokenDiceGame(myScanner, numGames);
+		TokenDiceGame game = new TokenDiceGame(numGames);
 
 		// Main loop
 		do {
