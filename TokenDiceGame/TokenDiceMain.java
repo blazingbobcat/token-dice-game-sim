@@ -1,3 +1,7 @@
+/* Token Dice Game Simulator
+Implementation Class
+June 4, 2021 */
+
 import java.util.*;
 
 class TokenDiceMain {
@@ -6,13 +10,16 @@ class TokenDiceMain {
 
 		long numOfGames = 0L;
 
+		// Introduce users to program
+		System.out.print("Welcome to the Token Dice Game Simulator!  This program will play through a game similar through Shut the Box as many times as the user enters.  It will then print out the games the CPU plays and the results of wins/loses.  Then the program will calculate the win percentage.  The purpose is to determine the overall probability of beating the token-dice game."); 
+
 		// Get number of desired games
 		do {
 			
 			try {
 		
 				// Prompt user for number of games
-				System.out.println("Please enter number of games: ");
+				System.out.println("\nPlease enter number of games: ");
 				numOfGames = scan.nextLong();
 								
 				// See if user enters invalid number
