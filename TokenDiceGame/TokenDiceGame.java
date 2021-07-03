@@ -1,6 +1,7 @@
 /* Token-flipping game Game class
 June 4, 2021 
 */
+
 import java.util.*;
 
 class TokenDiceGame {
@@ -92,7 +93,7 @@ class TokenDiceGame {
 
 				} // end if
 				
-				System.out.println("\nRoll #" + rollNumber);
+				System.out.println("\n\nRoll #" + rollNumber);
 				System.out.println("Sum of Dice: " + sumDice);
 
 				// Check if tokens match numbers on dice
@@ -104,11 +105,11 @@ class TokenDiceGame {
 
 					if (!tokens[b]) {
 					
-						System.out.println("Token " + (b + 1) + ": down"); 
+						System.out.print("\tToken " + (b + 1) + ": down"); 
 
 					} else {
 
-						System.out.println("Token " + (b + 1) + ": flipped");
+						System.out.print("\tToken " + (b + 1) + ": flipped");
 
 					} // end if
 
@@ -119,10 +120,12 @@ class TokenDiceGame {
 			// Game is won if maximum score for tokens
 			if (sumTokens == 78) {
 
+				System.out.println("\n\nWon game!");
 				winnings[0]++;
 
 			} else {
 
+				System.out.println("\n\nGame over");
 				winnings[1]++; // Game is lost if maximum score not acheived
 				
 			} // end if
@@ -132,7 +135,7 @@ class TokenDiceGame {
 
 		} // end for loop
 			
-		System.out.println("Won Games: " + winnings[0]);
+		System.out.println("\nWon Games: " + winnings[0]);
 		System.out.println("Lost Games: " + winnings[1]);
 		System.out.println("Win Percentage: " + winPercentage);
 
@@ -497,7 +500,7 @@ class TokenDiceGame {
 
 					tokens[0] = true;
 					sumTokens += 1;
-					tokens[9] = true;
+					tokens[8] = true;
 					sumTokens += 9;
 
 				} else if (!tokens[1] && !tokens[7]) {
