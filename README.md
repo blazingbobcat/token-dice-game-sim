@@ -7,7 +7,9 @@ $ Throughout history, there have been tabletop games involving dice and numbered
 
 $ This program is a simulation of trying to play Shut The Box and determining the probability of winning the game based on the number of games played.  The CPU will run through how ever many games the user enters and determine won or lost games each time.  Shut the Box can be played by one or many players.  The odds of winning are not different no matter the number of players.  However, some versions of the game have the object to end up with the most number of tokens flipped from the other players at the end of the game.
 
-$ This program will only be single-player Shut the Box, where the object is to clear all the numbered tokens based on the rolls of the dice by adding said tokens together to match what the dice show.  That means if the player runs out of tokens that can add up to the sum of the dice, he or she loses.  This may take a variable number of rolls, which the coding for the program anticipates.  Ideally, the player will roll each number of unflipped tokens in succession, in which he or she will only need to flip one at a time.  That would be the perfect game.  If all the flipped tokens are more than 6, one die is used to roll the rest of the game.
+$ This program will only be single-player Shut the Box, where the object is to clear all the numbered tokens based on the rolls of the dice by adding said tokens together to match what the dice show.  That means if the player runs out of tokens that can add up to the sum of the dice, he or she loses.  This may take a variable number of rolls, which the coding for the program anticipates.  If all the flipped tokens are more than 6, one die is used to roll the rest of the game.
+
+$ There are three perfect games for Shut the Box.  One is if the player rolls a different number and flips one token every time until all the tokens are exhausted.  Another is if the player eliminates all the tokens below 7 and then rolls a different number 7-12, eliminating the rest.  Still, the last perfect game involves eliminating all tokens greater than 6, thereby the player plays with one die and the rest of the tokens are taken care of.  The odds of rolling the first two games is 0.00537232170924782807498856881573 games in 100.  The odds off rolling the last is 0.34382858939186099679926840420668 games in 100.
 
 $ Here are all the possible combinations for taking away tokens based on the roll of the dice:
 
@@ -42,7 +44,7 @@ $ There are 3 classes for this program as follows:
   -- User needs to load this class in order to run simulation.
   -- Contains main loop prompting user for number of games, passing control over to TokenDiceGame class for simulations and back; and then prompting user if they want to run program again or not.
 
-$ Version 1.0 was a prototype.  This is version 1.2 with a number of improved features:
+$ Version 1.0 was a prototype.  This is version 1.2.1 with a number of improved features:
 - Elimination of god class TokenDiceGame;
 - Introduction of more functions in TokenDiceMain for improved implementation
 - Try-catch clauses for validation of user input
@@ -53,5 +55,7 @@ $ Version 1.0 was a prototype.  This is version 1.2 with a number of improved fe
 - All variables carefully chosen for data type to conserve resources (e.g. boolean for tokens)
 - Win percentage added at end of simulation besides won/lost games
 - Minor bug fixes
+- The above are version 1.2 improvements
+- Improved output for prompts and results
 
 Remember to type `java TokenDiceMain` to run program.  Thank you for trying my simulation! =)
