@@ -44,7 +44,7 @@ $ There are 3 classes for this program as follows:
   -- User needs to load this class in order to run simulation.
   -- Contains main loop prompting user for number of games, passing control over to TokenDiceGame class for simulations and back; and then prompting user if they want to run program again or not.
 
-$ Version 1.0 was a prototype.  This is version 1.2.1 with a number of improved features:
+$ Version 1.0 was a prototype.  This is version 1.2.2 with a number of improved features:
 - Elimination of god class TokenDiceGame;
 - Introduction of more functions in TokenDiceMain for improved implementation
 - Try-catch clauses for validation of user input
@@ -57,5 +57,7 @@ $ Version 1.0 was a prototype.  This is version 1.2.1 with a number of improved 
 - Minor bug fixes
 - The above are version 1.2 improvements
 - Improved output for prompts and results
+- The above is a version 1.2.1 improvement
+- More minor bug fixes
 
 Remember to type `java TokenDiceMain` to run program.  Thank you for trying my simulation! =)
