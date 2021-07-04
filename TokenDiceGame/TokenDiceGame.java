@@ -437,7 +437,7 @@ class TokenDiceGame {
 
 					tokens[1] = true;
 					sumTokens += 2;
-					tokens[5] = true;
+					tokens[6] = true;
 					sumTokens += 7;
 
 				} else if (!tokens[2] && !tokens[5]) {
