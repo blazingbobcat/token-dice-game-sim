@@ -3,6 +3,7 @@ June 4, 2021
 */
 
 import java.util.*;
+import java.io.*;
 
 class TokenDiceGame {
 	long numGames;
@@ -52,12 +53,54 @@ class TokenDiceGame {
 
 	} // end constructor
 
-	public void play() {
+	public void play() throws IOException {
 
 		// Main simulation loop
 
+		// Instantiate a Date object
+      		Date date = new Date();
+
+		// Create results file
+		try {
+
+			File myObj = new File("token_dice_results.txt"); // Results file
+      			if (myObj.createNewFile()) {
+
+       				System.out.println("Results file created: " + myObj.getName() + " on " + date.toString());
+
+     			} else {
+
+       				System.out.println("Results file " + myObj.getName() +" already exists.");
+
+     			}
+
+   		} catch (IOException e) {
+
+     			System.out.println("An error occurred.");
+      			e.printStackTrace();
+
+  		} // end try-catch
+
+		FileWriter myWriter = new FileWriter("token_dice_results.txt", true); // Writer for results file
+
+		// Write header in file
+		try {
+			
+			myWriter.write("\n\nToken Dice Game Results " + date.toString() + "\n");
+
+    		} catch (IOException e) {
+
+      			System.out.println("An error occurred.");
+      			e.printStackTrace();
+
+    		} // end try-catch
+
+		// Simulation start
+      		System.out.println("Simulation running...");
+
 		// Run through simulation of each game
 		for (long i = 0L; i < numGames; i++) {
+
 			// Reset match boolean
 			match = true;
 
@@ -70,8 +113,17 @@ class TokenDiceGame {
 			// Reset roll number
 			rollNumber = 0;
 
-			// Output game number
-			System.out.println("\nGame #" + (i + 1));
+			// Write game no. w/ date & time in file
+			try {
+			
+				myWriter.write("\nGame #" + (i + 1));
+
+    			} catch (IOException e) {
+
+      				System.out.println("An error occurred.");
+      				e.printStackTrace();
+
+    			} // end try-catch
 
 			// Main game loop
 			while (match) {
@@ -82,7 +134,17 @@ class TokenDiceGame {
 				// reduce dice by one.
 				if (sumTokens >= 57) {
 
-					System.out.println("Tokens less than six.  One die rolling...");
+					try {
+
+						myWriter.write("\nTokens less than six.  One die rolling...");
+
+		    			} catch (IOException e) {
+	
+      						System.out.println("An error occurred.");
+      						e.printStackTrace();
+
+		    			} // end try-catch
+
 					sumDice = diceOne.Roll();
 	
 				} else {
@@ -92,52 +154,96 @@ class TokenDiceGame {
 					sumDice = numOne + numTwo;
 
 				} // end if
-				
-				System.out.println("\n\nRoll #" + rollNumber);
-				System.out.println("Sum of Dice: " + sumDice);
+
+				// Write roll numbers to file
+				try {
+
+					myWriter.write("\n\nRoll #" + rollNumber + "\n");
+
+    				} catch (IOException e) {
+
+      					System.out.println("An error occurred.");
+      					e.printStackTrace();
+
+    				} // end try-catch
 
 				// Check if tokens match numbers on dice
 				match = matchSumDiceWithTokens(tokens, sumDice, sumTokens);
 
-				System.out.println("Tokens after flip: "); // Show which tokens are flipped and 									// which are down
+				// Write which tokens are flipped and which are down in file
+				try {
 
-				for (int b = 0; b < tokens.length; b++) {
+					myWriter.write("\nSum of dice: " + sumDice + "\n\n");
 
-					if (!tokens[b]) {
+					for (int b = 0; b < tokens.length; b++) {
+
+						if (!tokens[b]) {
 					
-						System.out.print("\tToken " + (b + 1) + ": down"); 
+							myWriter.write("\tToken " + (b + 1) + ": down\t"); 
 
-					} else {
+						} else {
 
-						System.out.print("\tToken " + (b + 1) + ": flipped");
+							myWriter.write("\tToken " + (b + 1) + ": flipped\t");
 
-					} // end if
+						} // end if
 
-				} // end for 
+					} // end for
+
+    				} catch (IOException e) {
+
+      					System.out.println("An error occurred.");
+      					e.printStackTrace();
+
+    				} // end try-catch
 
 			} // end game loop
 
 			// Game is won if maximum score for tokens
-			if (sumTokens == 78) {
+			try {
 
-				System.out.println("\n\nWon game!");
-				winnings[0]++;
+				// Write results to file
+				if (sumTokens == 78) {
 
-			} else {
+      					myWriter.write("\n\nWon Game!\n");
+					winnings[0]++; // Game is won
 
-				System.out.println("\n\nGame over");
-				winnings[1]++; // Game is lost if maximum score not acheived
+				} else {
+
+      					myWriter.write("\n\nGame Over\n");
+					winnings[1]++; // Game is lost
 				
-			} // end if
+				} // end if
+
+    			} catch (IOException e) {
+
+      				System.out.println("An error occurred.");
+      				e.printStackTrace();
+
+    			} // end try-catch
 
 			// Recalculate win percentage
 			winPercentage = winnings[0] / (winnings[0] + winnings[1]);
 
 		} // end for loop
-			
-		System.out.println("\nWon Games: " + winnings[0]);
-		System.out.println("Lost Games: " + winnings[1]);
-		System.out.println("Win Percentage: " + winPercentage);
+
+		// Tell user simulation is over
+		System.out.println("Simulation done.");
+		System.out.println("Check results file.");
+
+		// Print out results in file
+		try {
+
+			myWriter.write("\nWon Games: " + winnings[0]);
+			myWriter.write("\nLost Games: " + winnings[1]);
+			myWriter.write("\nWin Percentage: " + winPercentage);			
+   			myWriter.close(); // Always close writer
+
+    		} catch (IOException e) {
+
+      			System.out.println("An error occurred.");
+      			e.printStackTrace();
+
+  		} // end try-catch
 
 	} // end play function
 

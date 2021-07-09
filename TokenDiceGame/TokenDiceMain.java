@@ -3,15 +3,13 @@ Implementation Class
 June 4, 2021 */
 
 import java.util.*;
+import java.io.IOException;
 
 class TokenDiceMain {
 
 	public static long getNumGames(Scanner scan, String error) {
 
-		long numOfGames = 0L;
-
-		// Introduce users to program
-		System.out.print("Welcome to the Token Dice Game Simulator!  This program will play through a game similar through Shut the Box as many times as the user enters.  It will then print out the games the CPU plays and the results of wins/loses.  Then the program will calculate the win percentage.  The purpose is to determine the overall probability of beating the token-dice game."); 
+		long numOfGames = 0L; 
 
 		// Get number of desired games
 		do {
@@ -26,7 +24,7 @@ class TokenDiceMain {
 				if (numOfGames < 1) {
 
 					System.out.println("Games is less than 1.");
-					numOfGames = 0; // Return no games
+					numOfGames = 0L; // Return no games
 
 				} // end if
 
@@ -35,11 +33,11 @@ class TokenDiceMain {
 				// Catch error String
 				error = scan.next();
 				System.out.println("ERROR:  Invalid Input.");
-				numOfGames = 0;
+				numOfGames = 0L;
 
 			} // end try-catch
 
-		} while (numOfGames == 0);
+		} while (numOfGames == 0L);
 
 		return numOfGames;
 
@@ -78,7 +76,7 @@ class TokenDiceMain {
 
 	} // end function
 
-	public static void main(String[] args) {
+	public static void main(String[] args) throws IOException {
 
 		// Create scanner object
 		Scanner myScanner = new Scanner(System.in);
@@ -98,6 +96,9 @@ class TokenDiceMain {
 
 		// Create game object
 		TokenDiceGame game = new TokenDiceGame(numGames);
+
+		// Introduce users to program
+		System.out.print("Welcome to the Token Dice Game Simulator!  This program will play through a game similar through Shut the Box as many times as the user enters.  It will then print out the games the CPU plays and the results of wins/loses.  Then the program will calculate the win percentage.  The purpose is to determine the overall probability of beating the token-dice game.");
 
 		// Main loop
 		do {
